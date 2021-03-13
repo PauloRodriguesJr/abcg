@@ -4,6 +4,7 @@
 #include <array>
 
 #include "abcg.hpp"
+#include "imgui.h"
 
 class OpenGLWindow : public abcg::OpenGLWindow {
  protected:
@@ -13,10 +14,18 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   void resizeGL(int width, int height) override;
 
  private:
-  std::array<float, 4> m_clearColor{0.906f, 0.910f, 0.918f, 0.0f};
+  enum class GameState { Play, Draw, WinX, WinO };
+  static const int m_N{3};  // Board size is m_N x m_N
+  bool m_turn{true};
+  ImFont* m_font{};
+  GameState m_gameState{GameState::Play};
+  bool m_turn{true};                      // true = X, false = O
+  std::array<char, m_N * m_N> m_board{};  // '\0', 'X' or 'O'
 
-  int m_viewportWidth{};
-  int m_viewportHeight{};
+  ImFont* m_font{};
+
+  void checkBoard();
+  void restart();
 };
 
 #endif

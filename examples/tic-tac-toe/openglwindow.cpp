@@ -17,39 +17,56 @@ void OpenGLWindow::initializeGL() {
              windowSettings.height);
 }
 
-void OpenGLWindow::paintGL() {
-  // Set the clear color
-  glClearColor(m_clearColor[0], m_clearColor[1], m_clearColor[2],
-               m_clearColor[3]);
-  // Clear the color buffer
-  glClear(GL_COLOR_BUFFER_BIT);
-}
+void OpenGLWindow::paintGL() { glClear(GL_COLOR_BUFFER_BIT); }
 
 void OpenGLWindow::paintUI() {
-  // Parent class will show fullscreen button and FPS meter
-  abcg::OpenGLWindow::paintUI();
+  auto appWindowWidth{getWindowSettings().width};
+  auto appWindowHeight{getWindowSettings().height};
 
-  // Our own ImGui widgets go below
+  // "Tic-Tac-Toe" window
   {
-    // Window begin
-    ImGui::Begin("Tic-Tac-Toe Game");
+    // Cover 100% of the application window
+    auto windowWidth{appWindowWidth * 1.0f};
+    auto windowHeight{appWindowHeight * 1.0f};
+    ImGui::SetNextWindowSize(ImVec2(windowWidth, windowHeight));
+    ImGui::SetNextWindowPos(ImVec2((appWindowWidth - windowWidth) / 2,
+                                   (appWindowHeight - windowHeight) / 2));
+    auto flags{ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize};
+    ImGui::Begin("Tic-Tac-Toe", nullptr, flags);
 
-    // Static text
-    auto windowSettings{getWindowSettings()};
-    ImGui::Text("Current window size: %dx%d (in windowed mode)",
-                windowSettings.width, windowSettings.height);
-    int width = windowSettings.width;
-    int height = windowSettings.height;
-    ImGui::Button("", ImVec2(width / 3, height / 3));
-    ImGui::Button("", ImVec2(width / 3, height / 3));
-    ImGui::Button("", ImVec2(width / 3, height / 3));
-    // ImGui::Button("Press me!", ImVec2(-1, 200));
-    // 100x50 button
-    if (ImGui::Button("Press me!", ImVec2(100, 50))) {
-      fmt::print("Button pressed.\n");
+    std::string text;
+    text = fmt::format(
+        "Essa é uma mensagem: O jogo está começando O turno é de {}",
+        m_turn ? 'X' : 'O');
+    ImGui::Text("%s", text.c_str());
+    ImGui::Spacing();
+    ImGui::Spacing();
+
+    auto gridHeight{windowHeight - 22 - 58 - (m_N * 10) - 58};
+
+    // ImGui::PushFont(m_font);
+    for (auto i : iter::range(m_N)) {
+      ImGui::Columns(m_N);
+      for (auto j : iter::range(m_N)) {
+        auto offset{i * m_N + j};
+        ImGui::Button("-", ImVec2(-1, gridHeight / m_N + 0.01 * offset));
+        if (imGui::IsClicked) {
+          // operar missão
+        };
+        ImGui::NextColumn();
+      }
+      ImGui::Columns(1);
+      // ImGui::PopFont();
+
+      ImGui::Spacing();
+      ImGui::Spacing();
     }
+    // 100x50 button
+    // if (ImGui::Button("Press me!", ImVec2(100, 50))) {
+    //   fmt::print("Button pressed.\n");
+    // }
     // Nx50 button, where N is the remaining width available
-    ImGui::Button("Restart Game", ImVec2(-1, 80));
+    ImGui::Button("Restart Game", ImVec2(-1, 40));
     // See also IsItemHovered, IsItemActive, etc
     if (ImGui::IsItemClicked()) {
       fmt::print("Button pressed.\n");
